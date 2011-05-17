@@ -1,0 +1,1 @@
+$ -> $('a:not([data-remote]):not([data-behavior])').pjax('div#main')
