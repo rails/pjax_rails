@@ -7,7 +7,7 @@ To activate, add this to your app/assets/javascripts/application.js (or whatever
 
     //=require pjax
 
-All links that matches $('a:not([data-remote]):not([data-behavior])') will then use PJAX. 
+All links that match $('a:not([data-remote]):not([data-behavior])') will then use PJAX. 
 
 FIXME: Currently the layout is hardcoded to "application". Need to delegate that to the specific layout of the controller.
 
