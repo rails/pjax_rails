@@ -9,6 +9,19 @@ To activate, add this to your app/assets/javascripts/application.js (or whatever
 
 All links that match $('a:not([data-remote]):not([data-behavior])') will then use PJAX. 
 
+The PJAX container has to be marked with data-pjax-container=true, so for example:
+
+    <body>
+      <div>
+        <!-- This will not be touched on PJAX updates -->
+      </div>
+
+      <div data-pjax-container="true">
+        <!-- PJAX updates will go here -->
+      </div>
+    </body>
+
+
 FIXME: Currently the layout is hardcoded to "application". Need to delegate that to the specific layout of the controller.
 
 Examples for redirect_pjax_to
