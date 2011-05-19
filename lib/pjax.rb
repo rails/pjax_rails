@@ -2,14 +2,14 @@ module Pjax
   extend ActiveSupport::Concern
   
   included do
-    layout ->(c) { pjax_request? ? false : 'application' }
+    layout lambda {|c| c.pjax_request? ? false : 'application' }
   end
   
   private  
     def redirect_pjax_to(action, url = nil)
-      new_url = url_for(url ? url : { action: action })
+      new_url = url_for(url ? url : { action => action })
       
-      render js: <<-EJS
+      render :js, <<-EJS
         if (!window.history || !window.history.pushState) {
           window.location.href = '#{new_url}';
         } else {
