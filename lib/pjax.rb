@@ -13,10 +13,10 @@ module Pjax
         if (!window.history || !window.history.pushState) {
           window.location.href = '#{new_url}';
         } else {
-          $('div.pages').html(#{render_to_string("#{action}.html.erb").to_json});
+          $('[data-pjax-container]').html(#{render_to_string("#{action}.html.erb").to_json});
           $(document).trigger('end.pjax');
 
-          var title = $.trim($('div.pages').find('title').remove().text());
+          var title = $.trim($('[data-pjax-container]').find('title').remove().text());
           if (title) document.title = title;
           window.history.pushState({}, document.title, '#{new_url}');
         }
