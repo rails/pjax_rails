@@ -1,1 +1,1 @@
-$ -> $('a:not([data-remote]):not([data-behavior])').pjax('[data-pjax-container]')
+$ -> $('a:not([data-remote]):not([data-behavior]):not([data-skip-pjax])').pjax('[data-pjax-container]')
