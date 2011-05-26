@@ -22,7 +22,7 @@ The PJAX container has to be marked with data-pjax-container attribute, so for e
         <%= content_tag :h3, 'My site' %>
         <%= link_to 'About me', about_me_path %>
         <!-- The following link will not be pjax'd -->
-        <%= link_to 'Google', 'http://google.com', :data-skip-pjax => true %>
+        <%= link_to 'Google', 'http://google.com', 'data-skip-pjax' => true %>
       </div>
     </body>
 
