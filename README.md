@@ -64,3 +64,19 @@ Examples for redirect_pjax_to
           @project = current_user.projects.find params[:id].to_i
         end
     end
+
+PJAX OPTIONS (Fast and dirty solution)
+------------
+in application.js:
+
+  window.pjax_options = { timeout: 5000 }
+  
+     container - The selector of the container to load the reponse body into, or
+                 the container itself.
+clickedElement - The element that was clicked to start the pjax call.
+          push - Whether to pushState the URL. Defaults to true (of course).
+       replace - Whether to replaceState the URL. Defaults to false.
+       timeout - pjax sets this low, <1s. Set this higher if using a custom
+                 error handler. It's in ms, so something like `timeout: 2000`
+         error - By default this callback reloads the target page once `timeout`
+                 ms elapses.
