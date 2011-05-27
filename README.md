@@ -65,8 +65,9 @@ Examples for redirect_pjax_to
         end
     end
 
-PJAX OPTIONS (Fast and dirty solution)
+PJAX OPTIONS
 ------------
+
 in application.js:
 
     window.pjax_options = { timeout: 5000 }
