@@ -2,7 +2,7 @@ module Pjax
   extend ActiveSupport::Concern
   
   included do
-    layout ->(c) { pjax_request? ? false : 'application' }
+    before_filter lambda { self.class.send(:layout, false) if pjax_request? }
   end
   
   private  
