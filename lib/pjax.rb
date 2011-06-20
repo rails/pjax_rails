@@ -2,7 +2,16 @@ module Pjax
   extend ActiveSupport::Concern
   
   included do
-    before_filter lambda { self.class.send(:layout, false) if pjax_request? }
+    before_filter lambda {      
+      if pjax_request? 
+        self.instance_eval do         
+          @old_layout = self.send("_layout")
+        end      
+        self.class.send(:layout, false) 
+      end
+    }
+
+    after_filter lambda {self.class.send(:layout, self.instance_variable_get(:@old_layout)) if pjax_request?}
   end
   
   private  
