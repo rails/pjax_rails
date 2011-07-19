@@ -3,6 +3,7 @@ module Pjax
   
   included do
     layout ->(c) { pjax_request? ? false : 'application' }
+    helper_method :pjax_request?
   end
   
   private  
