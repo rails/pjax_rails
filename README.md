@@ -1,7 +1,7 @@
 PJAX for Rails 3.1+
 ===================
 
-Integrate Chris Wanstrath's PJAX into Rails 3.1+ via the asset pipeline.
+Integrate Chris Wanstrath's [PJAX](https://github.com/defunkt/jquery-pjax) into Rails 3.1+ via the asset pipeline.
 
 To activate, add this to your app/assets/javascripts/application.js (or whatever bundle you use):
 
@@ -22,7 +22,7 @@ The PJAX container has to be marked with data-pjax-container attribute, so for e
         <%= content_tag :h3, 'My site' %>
         <%= link_to 'About me', about_me_path %>
         <!-- The following link will not be pjax'd -->
-        <%= link_to 'Google', 'http://google.com', :data-skip-pjax => true %>
+        <%= link_to 'Google', 'http://google.com', 'data-skip-pjax' => true %>
       </div>
     </body>
 
