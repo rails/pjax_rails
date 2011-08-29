@@ -1,3 +1,7 @@
+*0.1.9*
+
+* Use latest jquery-pjax JavaScript code [2011-08-29 version, see https://github.com/defunkt/jquery-pjax/commits/master]
+
 *0.1.8*
 
 * Expand the selector to allow data-skip-pjax to be applied to a container and have that affect all its children [Sam Stephenson]
