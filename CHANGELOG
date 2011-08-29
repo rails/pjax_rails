@@ -1,0 +1,3 @@
+*0.1.8*
+
+* Expand the selector to allow data-skip-pjax to be applied to a container and have that affect all its children [Sam Stephenson]
