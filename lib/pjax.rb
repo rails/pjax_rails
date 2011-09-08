@@ -2,7 +2,8 @@ module Pjax
   extend ActiveSupport::Concern
   
   included do
-    layout ->(c) { pjax_request? ? false : 'application' }
+    alias_method :old_layout, :_layout
+    layout ->(c) { pjax_request? ? false : c.send(:old_layout) }
     helper_method :pjax_request?
   end
   
