@@ -7,14 +7,16 @@ module Pjax
   end
   
   private  
-    def redirect_pjax_to(action, url = nil)
+    def redirect_pjax_to(action, url = nil, ext = nil)
       new_url = url_for(url ? url : { action: action })
-      
+      ext = ext.present? ? ext : "html"
+
+      # Fixed: Don't hardcode .erb
       render js: <<-EJS
         if (!window.history || !window.history.pushState) {
           window.location.href = '#{new_url}';
         } else {
-          $('[data-pjax-container]').html(#{render_to_string("#{action}.html.erb", layout: false).to_json});
+          $('[data-pjax-container]').html(#{render_to_string("#{action}.#{ext}", layout: false).to_json});
           $(document).trigger('end.pjax');
 
           var title = $.trim($('[data-pjax-container]').find('title').remove().text());
