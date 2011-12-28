@@ -15,7 +15,7 @@ module Pjax
         if (!window.history || !window.history.pushState) {
           window.location.href = '#{new_url}';
         } else {
-          #{render_js ? render_to_string(action.to_s+".js") : nil}
+          #{render_to_string(params[:action].to_s+".js") if render_js}
           $('[data-pjax-container]').html(#{render_to_string("#{action}.html", layout: false).to_json});
           $(document).trigger('end.pjax');
 
