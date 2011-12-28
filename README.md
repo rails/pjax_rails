@@ -29,6 +29,20 @@ The PJAX container has to be marked with data-pjax-container attribute, so for e
 
 FIXME: Currently the layout is hardcoded to "application". Need to delegate that to the specific layout of the controller.
 
+Examples for setting the title
+------------------------------
+
+There is a couple of ways that you can set the title: You can
+
+  1. Set a `<title>something</title>` tag on each view file to update the title.
+  2. Set the `data-title` attribute on a html element. This will use either the attribute value (if present) or the content of the element.
+  
+Examples:
+
+`<h1 data-title="This is the title">Something great</h1>` will set the title to "This is the title"
+
+`<h1 data-title>Something new</h1>` will set the title to "Something new"
+
 Examples for redirect_pjax_to
 -----------------------------
 
