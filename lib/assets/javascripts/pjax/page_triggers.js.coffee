@@ -2,7 +2,7 @@ $(document).ready ->
   $(document).trigger 'pageChanged'
   $(document).trigger 'pageUpdated'
 
-$(document).bind 'end.pjax', ->
+$(document).bind 'pjax:end', ->
   $(document).trigger 'pageChanged'
   $(document).trigger 'pageUpdated'
 

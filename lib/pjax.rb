@@ -15,7 +15,7 @@ module Pjax
           window.location.href = '#{new_url}';
         } else {
           $('[data-pjax-container]').html(#{render_to_string("#{action}.html.erb", layout: false).to_json});
-          $(document).trigger('end.pjax');
+          $(document).trigger('pjax:end');
 
           var title = $.trim($('[data-pjax-container]').find('title').remove().text());
           if (title) document.title = title;
