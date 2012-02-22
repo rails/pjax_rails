@@ -2,9 +2,14 @@ module Pjax
   extend ActiveSupport::Concern
 
   included do
-    layout proc { |c| pjax_request? ? false : 'application' }
+    layout proc { |c| pjax_request? ? pjax_layout : 'application' }
     helper_method :pjax_request?
   end
+
+  protected
+    def pjax_layout
+      false
+    end
 
   private
     def redirect_pjax_to(action, url = nil)
