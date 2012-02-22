@@ -64,3 +64,10 @@ Examples for redirect_pjax_to
           @project = current_user.projects.find params[:id].to_i
         end
     end
+
+PJAX OPTIONS
+------------
+
+in application.js:
+
+    window.pjax_options = { timeout: 5000 }
