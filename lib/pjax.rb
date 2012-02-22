@@ -4,6 +4,7 @@ module Pjax
   included do
     layout proc { |c| pjax_request? ? pjax_layout : 'application' }
     helper_method :pjax_request?
+    before_filter :strip_pjax_param
     around_filter :set_pjax_url
   end
 
@@ -14,6 +15,15 @@ module Pjax
 
     def pjax_layout
       false
+    end
+
+    def strip_pjax_param
+      params.delete(:_pjax)
+      request.env['QUERY_STRING'] = Rack::Utils.build_query(params)
+
+      request.env.delete('rack.request.query_string')
+      request.env.delete('rack.request.query_hash')
+      request.env.delete('action_dispatch.request.query_parameters')
     end
 
     def set_pjax_url
