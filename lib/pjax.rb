@@ -4,11 +4,21 @@ module Pjax
   included do
     layout proc { |c| pjax_request? ? pjax_layout : 'application' }
     helper_method :pjax_request?
+    around_filter :set_pjax_url
   end
 
   protected
+    def pjax_request?
+      env['HTTP_X_PJAX'].present?
+    end
+
     def pjax_layout
       false
+    end
+
+    def set_pjax_url
+      yield
+      response.headers['X-PJAX-URL'] = request.url
     end
 
   private
@@ -27,9 +37,5 @@ module Pjax
           window.history.pushState({}, document.title, '#{new_url}');
         }
       EJS
-    end
-
-    def pjax_request?
-      env['HTTP_X_PJAX'].present?
     end
 end
