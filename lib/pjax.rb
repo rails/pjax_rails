@@ -23,6 +23,8 @@ module Pjax
 
   private
     def redirect_pjax_to(action, url = nil)
+      ActiveSupport::Deprecation.warn 'redirect_pjax_to is deprecated and will be removed in 0.4.0, use a regular redirect_to instead.'
+
       new_url = url_for(url ? url : { :action => action })
 
       render :js => <<-EJS
