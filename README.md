@@ -33,8 +33,6 @@ Examples for redirect_pjax_to
 -----------------------------
 
     class ProjectsController < ApplicationController
-      before_filter :set_project, except: [ :index, :create ]
-
       def index
         @projects = current_user.projects
       end
@@ -60,7 +58,7 @@ Examples for redirect_pjax_to
       end
   
       private
-        def set_project
-          @project = current_user.projects.find params[:id].to_i
+        def project
+          @project ||= current_user.projects.find params[:id].to_i
         end
     end
