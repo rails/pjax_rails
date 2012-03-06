@@ -29,7 +29,7 @@ The PJAX container has to be marked with data-pjax-container attribute, so for e
 
 FIXME: Currently the layout is hardcoded to "application". Need to delegate that to the specific layout of the controller.
 
-Examples for redirect_pjax_to
+Examples for redirect_to
 -----------------------------
 
     class ProjectsController < ApplicationController
@@ -44,19 +44,19 @@ Examples for redirect_pjax_to
   
       def create
         @project = Project.create params[:project]
-        redirect_pjax_to :show, @project
+        redirect_to :show, @project
       end
   
       def update
         @project.update_attributes params[:project]
-        redirect_pjax_to :show, @project
+        redirect_to :show, @project
       end
   
       def destroy
         @project.destroy
 
         index # set the objects needed for rendering index
-        redirect_pjax_to :index
+        redirect_to :index
       end
   
       private
