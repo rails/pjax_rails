@@ -4,8 +4,9 @@ module Pjax
   included do
     layout proc { |c| pjax_request? ? pjax_layout : 'application' }
     helper_method :pjax_request?
-    before_filter :strip_pjax_param
-    around_filter :set_pjax_url
+
+    before_filter :strip_pjax_param, :if => :pjax_request?
+    around_filter :set_pjax_url, :if => :pjax_request?
   end
 
   protected
