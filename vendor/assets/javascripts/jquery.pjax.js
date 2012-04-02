@@ -24,9 +24,8 @@
 //
 // Returns the jQuery object
 $.fn.pjax = function( container, options ) {
-  options = optionsFor(container, options)
   return this.live('click', function(event){
-    return handleClick(event, options)
+    return handleClick(event, container, options)
   })
 }
 
@@ -54,6 +53,9 @@ function handleClick(event, container, options) {
 
   var link = event.currentTarget
 
+  if (link.tagName.toUpperCase() !== 'A')
+    throw "$.fn.pjax or $.pjax.click requires an anchor element"
+
   // Middle click, cmd click, and ctrl click should open
   // links in a new tab as normal.
   if ( event.which > 1 || event.metaKey )
@@ -71,7 +73,8 @@ function handleClick(event, container, options) {
   var defaults = {
     url: link.href,
     container: $(link).attr('data-pjax'),
-    clickedElement: $(link),
+    target: link,
+    clickedElement: $(link), // DEPRECATED: use target
     fragment: null
   }
 
@@ -81,16 +84,16 @@ function handleClick(event, container, options) {
   return false
 }
 
-// Internal: Strips _pjax=true param from url
+// Internal: Strips _pjax param from url
 //
 // url - String
 //
 // Returns String.
 function stripPjaxParam(url) {
   return url
-    .replace(/\?_pjax=true&?/, '?')
-    .replace(/_pjax=true&?/, '')
-    .replace(/\?$/, '')
+    .replace(/\?_pjax=[^&]+&?/, '?')
+    .replace(/_pjax=[^&]+&?/, '')
+    .replace(/[\?&]$/, '')
 }
 
 // Internal: Parse URL components and returns a Locationish object.
@@ -131,6 +134,11 @@ var pjax = $.pjax = function( options ) {
     options.url = options.url()
   }
 
+  var target = options.target
+
+  // DEPRECATED: use options.target
+  if (!target && options.clickedElement) target = options.clickedElement[0]
+
   var url  = options.url
   var hash = parseURL(url).hash
 
@@ -141,20 +149,29 @@ var pjax = $.pjax = function( options ) {
       oldSuccess    = options.success,
       oldError      = options.error
 
-  options.context = findContainerFor(options.container)
+  var context = options.context = findContainerFor(options.container)
+
+  // We want the browser to maintain two separate internal caches: one
+  // for pjax'd partial page loads and one for normal page loads.
+  // Without adding this secret parameter, some browsers will often
+  // confuse the two.
+  if (!options.data) options.data = {}
+  options.data._pjax = context.selector
+
+  function fire(type, args) {
+    var event = $.Event(type, { relatedTarget: target })
+    context.trigger(event, args)
+    return !event.isDefaultPrevented()
+  }
 
   var timeoutTimer
 
   options.beforeSend = function(xhr, settings) {
-    var context = this
-
     url = stripPjaxParam(settings.url)
 
     if (settings.timeout > 0) {
       timeoutTimer = setTimeout(function() {
-        var event = $.Event('pjax:timeout')
-        context.trigger(event, [xhr, options])
-        if (event.result !== false)
+        if (fire('pjax:timeout', [xhr, options]))
           xhr.abort('timeout')
       }, settings.timeout)
 
@@ -163,6 +180,7 @@ var pjax = $.pjax = function( options ) {
     }
 
     xhr.setRequestHeader('X-PJAX', 'true')
+    xhr.setRequestHeader('X-PJAX-Container', context.selector)
 
     var result
 
@@ -172,14 +190,11 @@ var pjax = $.pjax = function( options ) {
       if (result === false) return false
     }
 
-    var event = $.Event('pjax:beforeSend')
-    this.trigger(event, [xhr, settings])
-    result = event.result
-    if (result === false) return false
+    if (!fire('pjax:beforeSend', [xhr, settings])) return false
 
-    this.trigger('pjax:start', [xhr, options])
+    fire('pjax:start', [xhr, options])
     // start.pjax is deprecated
-    this.trigger('start.pjax', [xhr, options])
+    fire('start.pjax', [xhr, options])
   }
 
   options.complete = function(xhr, textStatus) {
@@ -189,11 +204,11 @@ var pjax = $.pjax = function( options ) {
     // DEPRECATED: Invoke original `complete` handler
     if (oldComplete) oldComplete.apply(this, arguments)
 
-    this.trigger('pjax:complete', [xhr, textStatus, options])
+    fire('pjax:complete', [xhr, textStatus, options])
 
-    this.trigger('pjax:end', [xhr, options])
+    fire('pjax:end', [xhr, options])
     // end.pjax is deprecated
-    this.trigger('end.pjax', [xhr, options])
+    fire('end.pjax', [xhr, options])
   }
 
   options.error = function(xhr, textStatus, errorThrown) {
@@ -203,9 +218,8 @@ var pjax = $.pjax = function( options ) {
     // DEPRECATED: Invoke original `error` handler
     if (oldError) oldError.apply(this, arguments)
 
-    var event = $.Event('pjax:error')
-    this.trigger(event, [xhr, textStatus, errorThrown, options])
-    if (textStatus !== 'abort' && event.result !== false)
+    var allowed = fire('pjax:error', [xhr, textStatus, errorThrown, options])
+    if (textStatus !== 'abort' && allowed)
       window.location = url
   }
 
@@ -278,7 +292,7 @@ var pjax = $.pjax = function( options ) {
     // DEPRECATED: Invoke original `success` handler
     if (oldSuccess) oldSuccess.apply(this, arguments)
 
-    this.trigger('pjax:success', [data, status, xhr, options])
+    fire('pjax:success', [data, status, xhr, options])
   }
 
 
@@ -361,10 +375,6 @@ pjax.defaults = {
   timeout: 650,
   push: true,
   replace: false,
-  // We want the browser to maintain two separate internal caches: one for
-  // pjax'd partial page loads and one for normal page loads. Without
-  // adding this secret parameter, some browsers will often confuse the two.
-  data: { _pjax: true },
   type: 'GET',
   dataType: 'html'
 }
