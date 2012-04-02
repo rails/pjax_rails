@@ -31,24 +31,4 @@ module Pjax
       yield
       response.headers['X-PJAX-URL'] = request.url
     end
-
-  private
-    def redirect_pjax_to(action, url = nil)
-      ActiveSupport::Deprecation.warn 'redirect_pjax_to is deprecated and will be removed in 0.4.0, use a regular redirect_to instead.'
-
-      new_url = url_for(url ? url : { :action => action })
-
-      render :js => <<-EJS
-        if (!window.history || !window.history.pushState) {
-          window.location.href = '#{new_url}';
-        } else {
-          $('[data-pjax-container]').html(#{render_to_string("#{action}.html.erb", :layout => false).to_json});
-          $(document).trigger('end.pjax');
-
-          var title = $.trim($('[data-pjax-container]').find('title').remove().text());
-          if (title) document.title = title;
-          window.history.pushState({}, document.title, '#{new_url}');
-        }
-      EJS
-    end
 end
