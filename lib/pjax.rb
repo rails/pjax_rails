@@ -6,7 +6,7 @@ module Pjax
     helper_method :pjax_request?
 
     before_filter :strip_pjax_param, :if => :pjax_request?
-    around_filter :set_pjax_url, :if => :pjax_request?
+    before_filter :set_pjax_url,     :if => :pjax_request?
   end
 
   protected
@@ -33,7 +33,6 @@ module Pjax
     end
 
     def set_pjax_url
-      yield
       response.headers['X-PJAX-URL'] = request.url
     end
 end
