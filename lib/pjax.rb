@@ -18,6 +18,11 @@ module Pjax
       false
     end
 
+    def pjax_container
+      return unless pjax_request?
+      request.headers['X-PJAX-Container']
+    end
+
     def strip_pjax_param
       params.delete(:_pjax)
       request.env['QUERY_STRING'] = Rack::Utils.build_query(params)
