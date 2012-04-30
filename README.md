@@ -5,7 +5,7 @@ Integrate Chris Wanstrath's [PJAX](https://github.com/defunkt/jquery-pjax) into 
 
 To activate, add this to your app/assets/javascripts/application.js (or whatever bundle you use):
 
-    //=require pjax
+    //=require jquery.pjax
 
 All links that match `$('a:not([data-remote]):not([data-behavior]):not([data-skip-pjax])')` will then use PJAX. 
 
