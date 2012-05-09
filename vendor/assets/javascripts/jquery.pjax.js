@@ -53,16 +53,12 @@ function handleClick(event, container, options) {
 
   var link = event.currentTarget
 
-  // If current target isnt a link, try to find the first A descendant
   if (link.tagName.toUpperCase() !== 'A')
-    link = $(link).find('a')[0]
-
-  if (!link)
     throw "$.fn.pjax or $.pjax.click requires an anchor element"
 
   // Middle click, cmd click, and ctrl click should open
   // links in a new tab as normal.
-  if ( event.which > 1 || event.metaKey )
+  if ( event.which > 1 || event.metaKey || event.ctrlKey )
     return
 
   // Ignore cross origin links
@@ -167,20 +163,8 @@ var pjax = $.pjax = function( options ) {
       if (result === false) return false
     }
 
-    if (!fire('pjax:beforeSend', [xhr, settings])) return false
-
-    if (options.push && !options.replace) {
-      // Cache current container element before replacing it
-      containerCache.push(pjax.state.id, context.clone(true, true).contents())
-
-      window.history.pushState(null, "", options.url)
-    }
-
-    fire('pjax:start', [xhr, options])
-    // start.pjax is deprecated
-    fire('start.pjax', [xhr, options])
-
-    fire('pjax:send', [xhr, settings])
+    if (!fire('pjax:beforeSend', [xhr, settings]))
+      return false
   }
 
   options.complete = function(xhr, textStatus) {
@@ -219,6 +203,7 @@ var pjax = $.pjax = function( options ) {
     pjax.state = {
       id: options.id || uniqueId(),
       url: container.url,
+      title: container.title,
       container: context.selector,
       fragment: options.fragment,
       timeout: options.timeout
@@ -260,6 +245,7 @@ var pjax = $.pjax = function( options ) {
     pjax.state = {
       id: uniqueId(),
       url: window.location.href,
+      title: document.title,
       container: context.selector,
       fragment: options.fragment,
       timeout: options.timeout
@@ -275,10 +261,25 @@ var pjax = $.pjax = function( options ) {
   }
 
   pjax.options = options
-  pjax.xhr = $.ajax(options)
+  var xhr = pjax.xhr = $.ajax(options)
 
-  // pjax event is deprecated
-  $(document).trigger('pjax', [pjax.xhr, options])
+  if (xhr.readyState > 0) {
+    // pjax event is deprecated
+    $(document).trigger('pjax', [xhr, options])
+
+    if (options.push && !options.replace) {
+      // Cache current container element before replacing it
+      containerCache.push(pjax.state.id, context.clone(true, true).contents())
+
+      window.history.pushState(null, "", options.url)
+    }
+
+    fire('pjax:start', [xhr, options])
+    // start.pjax is deprecated
+    fire('start.pjax', [xhr, options])
+
+    fire('pjax:send', [xhr, options])
+  }
 
   return pjax.xhr
 }
@@ -587,6 +588,12 @@ $(window).bind('popstate', function(event){
         containerCache[direction](pjax.state.id, container.clone(true, true).contents())
       }
 
+      var popstateEvent = $.Event('pjax:popstate', {
+        state: state,
+        direction: direction
+      })
+      container.trigger(popstateEvent)
+
       var options = {
         id: state.id,
         url: state.url,
@@ -604,6 +611,7 @@ $(window).bind('popstate', function(event){
         // end.pjax event is deprecated
         container.trigger('start.pjax', [null, options])
 
+        if (state.title) document.title = state.title
         container.html(contents)
         pjax.state = state
 
@@ -635,7 +643,6 @@ $.support.pjax =
   window.history && window.history.pushState && window.history.replaceState
   // pushState isn't reliable on iOS until 5.
   && !navigator.userAgent.match(/((iPod|iPhone|iPad).+\bOS\s+[1-4]|WebApps\/.+CFNetwork)/)
-
 
 // Fall back to normalcy for older browsers.
 if ( !$.support.pjax ) {
