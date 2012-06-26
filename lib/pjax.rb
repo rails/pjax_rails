@@ -2,7 +2,7 @@ module Pjax
   extend ActiveSupport::Concern
 
   included do
-    layout proc { |c| pjax_request? ? pjax_layout : 'application' }
+    layout proc { |c| pjax_request? ? pjax_layout : application_layout }
     helper_method :pjax_request?
 
     rescue_from Pjax::Unsupported, :with => :pjax_unsupported
@@ -17,6 +17,10 @@ module Pjax
   protected
     def pjax_request?
       env['HTTP_X_PJAX'].present?
+    end
+
+    def application_layout
+      'application'
     end
 
     def pjax_layout
