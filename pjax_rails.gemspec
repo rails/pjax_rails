@@ -7,5 +7,5 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'jquery-rails'
 
-  s.files = Dir["#{File.dirname(__FILE__)}/**/*"]
+  s.files = Dir["lib/**/*.rb", "lib/**/*.js", "vendor/**/*.js"]
 end
