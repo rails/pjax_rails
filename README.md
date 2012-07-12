@@ -7,9 +7,17 @@ To activate, add this to your app/assets/javascripts/application.js (or whatever
 
     //=require jquery.pjax
 
-All links that match `$('a:not([data-remote]):not([data-behavior]):not([data-skip-pjax])')` will then use PJAX. 
+In previous versions of `pjax_rails`, most links would automatically use PJAX.
+However, this was found to be too inflexible; instead, the types of links you
+want to exhibit PJAX should be explicitly enabled:
 
-The PJAX container has to be marked with data-pjax-container attribute, so for example:
+    # app/assets/javascripts/application.js
+    $(function() {
+      $('a:not([data-remote]):not([data-behavior]):not([data-skip-pjax])').pjax('[data-pjax-container]');
+    });
+
+For this example, the PJAX container has to be marked with data-pjax-container
+attribute, so for example:
 
     <body>
       <div>
