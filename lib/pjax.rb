@@ -5,14 +5,14 @@ module Pjax
     layout proc { |c| pjax_request? ? pjax_layout : 'application' }
     helper_method :pjax_request?
 
+    rescue_from Pjax::Unsupported, :with => :pjax_unsupported
+
     before_filter :strip_pjax_param, :if => :pjax_request?
     before_filter :set_pjax_url,     :if => :pjax_request?
   end
 
   class Error < StandardError; end
   class Unsupported < Error; end
-
-  rescue_from Pjax::Unsupported, :with => :pjax_unsupported
 
   protected
     def pjax_request?
