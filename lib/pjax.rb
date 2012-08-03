@@ -9,6 +9,11 @@ module Pjax
     before_filter :set_pjax_url,     :if => :pjax_request?
   end
 
+  class Error < StandardError; end
+  class Unsupported < Error; end
+
+  rescue_from Pjax::Unsupported, :with => :pjax_unsupported
+
   protected
     def pjax_request?
       env['HTTP_X_PJAX'].present?
@@ -21,6 +26,25 @@ module Pjax
     def pjax_container
       return unless pjax_request?
       request.headers['X-PJAX-Container']
+    end
+
+    def pjax_unsupported
+      head :not_acceptable
+    end
+
+    # Call in a before_filter or in an action to disable pjax on an action.
+    #
+    # Examples
+    #
+    #     before_filter :prevent_pjax!
+    #
+    #     def login
+    #       prevent_pjax!
+    #       # ...
+    #     end
+    #
+    def prevent_pjax!
+      raise PjaxUnsupported if pjax_request?
     end
 
     def strip_pjax_param
