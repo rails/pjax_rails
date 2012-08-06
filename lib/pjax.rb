@@ -44,7 +44,7 @@ module Pjax
     #     end
     #
     def prevent_pjax!
-      raise PjaxUnsupported if pjax_request?
+      raise Pjax::Unsupported if pjax_request?
     end
 
     def strip_pjax_param
