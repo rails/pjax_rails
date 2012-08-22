@@ -44,10 +44,10 @@ function fnPjax(container, options) {
 //
 //  $(document).on('click', 'a', function(event) {
 //    var container = $(this).closest('[data-pjax-container]')
-//    return $.pjax.click(event, container)
+//    $.pjax.click(event, container)
 //  })
 //
-// Returns false if pjax runs, otherwise nothing.
+// Returns nothing.
 function handleClick(event, container, options) {
   options = optionsFor(container, options)
 
@@ -80,6 +80,44 @@ function handleClick(event, container, options) {
     target: link,
     clickedElement: $(link), // DEPRECATED: use target
     fragment: null
+  }
+
+  pjax($.extend({}, defaults, options))
+
+  event.preventDefault()
+}
+
+// Public: pjax on form submit handler
+//
+// Exported as $.pjax.submit
+//
+// event   - "click" jQuery.Event
+// options - pjax options
+//
+// Examples
+//
+//  $(document).on('submit', 'form', function(event) {
+//    var container = $(this).closest('[data-pjax-container]')
+//    $.pjax.submit(event, container)
+//  })
+//
+// Returns nothing.
+function handleSubmit(event, container, options) {
+  options = optionsFor(container, options)
+
+  var form = event.currentTarget
+
+  if (form.tagName.toUpperCase() !== 'FORM')
+    throw "$.pjax.submit requires a form element"
+
+  var defaults = {
+    type: form.method,
+    url: form.action,
+    data: $(form).serializeArray(),
+    container: $(form).attr('data-pjax'),
+    target: form,
+    fragment: null,
+    timeout: 0
   }
 
   pjax($.extend({}, defaults, options))
@@ -294,7 +332,7 @@ function pjax(options) {
       // Cache current container element before replacing it
       cachePush(pjax.state.id, context.clone().contents())
 
-      window.history.pushState(null, "", options.url)
+      window.history.pushState(null, "", stripPjaxParam(options.requestUrl))
     }
 
     fire('pjax:start', [xhr, options])
@@ -525,13 +563,7 @@ function findContainerFor(container) {
 //
 // Returns a jQuery object.
 function findAll(elems, selector) {
-  var results = $()
-  elems.each(function() {
-    if ($(this).is(selector))
-      results = results.add(this)
-    results = results.add(selector, this)
-  })
-  return results
+  return elems.filter(selector).add(elems.find(selector));
 }
 
 // Internal: Extracts container and metadata from response.
@@ -664,6 +696,7 @@ function enable() {
   $.pjax.enable = $.noop
   $.pjax.disable = disable
   $.pjax.click = handleClick
+  $.pjax.submit = handleSubmit
   $.pjax.reload = pjaxReload
   $.pjax.defaults = {
     timeout: 650,
@@ -694,6 +727,7 @@ function disable() {
   $.pjax.enable = enable
   $.pjax.disable = $.noop
   $.pjax.click = $.noop
+  $.pjax.submit = $.noop
   $.pjax.reload = window.location.reload
   $(window).unbind('popstate.pjax', onPjaxPopstate)
 }
