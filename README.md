@@ -34,5 +34,6 @@ attribute, so for example:
       </div>
     </body>
 
-
+Also, you need to add this line in config/application.rb
+    config.middleware.use Rack::Pjax
 FIXME: Currently the layout is hardcoded to "application". Need to delegate that to the specific layout of the controller.
