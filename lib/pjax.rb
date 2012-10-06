@@ -14,6 +14,14 @@ module Pjax
   class Error < StandardError; end
   class Unsupported < Error; end
 
+  module ClassMethods
+    def uses_pjax_layout(my_layout)
+      define_method 'pjax_layout' do
+        my_layout.to_s
+      end
+    end
+  end
+
   protected
     def pjax_request?
       env['HTTP_X_PJAX'].present?
