@@ -38,4 +38,20 @@ attribute, so for example:
 </body>
 ```
 
+Declare a custom pjax layout for a controller with the `uses_pjax_layout :pjax` method, where `:pjax` matches the name of your custom layout. For example, first declare the custom layout in your controller:
+
+```ruby
+class MyController < ApplicationController
+  uses_pjax_layout :pjax
+
+  # More controller code...
+end
+```
+Then create a new pjax layout at `app/views/layouts/pjax.html.erb`. A minimal example with just a `<title>` tag might look like this:
+
+```erb
+<title><%= yield(:title) %></title>
+<%= yield %>
+```
+
 FIXME: Currently the non-pjax layout is hardcoded to "application". Need to delegate that to the specific layout of the controller.
