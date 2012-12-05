@@ -13,7 +13,7 @@ want to exhibit PJAX should be explicitly enabled:
 
     # app/assets/javascripts/application.js
     $(function() {
-      $('a:not([data-remote]):not([data-behavior]):not([data-skip-pjax])').pjax('[data-pjax-container]');
+      $('[data-pjax-container]').pjax('a:not([data-remote]):not([data-behavior]):not([data-skip-pjax])');
     });
 
 For this example, the PJAX container has to be marked with data-pjax-container
