@@ -34,5 +34,7 @@ attribute, so for example:
       </div>
     </body>
 
+Note that version 0.3.4 introduced breaking API changes.  Details at
+[PJAX - upgrade it](https://github.com/defunkt/jquery-pjax#upgrade-it)
 
 FIXME: Currently the layout is hardcoded to "application". Need to delegate that to the specific layout of the controller.
