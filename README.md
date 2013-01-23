@@ -35,4 +35,14 @@ attribute, so for example:
     </body>
 
 
-FIXME: Currently the layout is hardcoded to "application". Need to delegate that to the specific layout of the controller.
+By default, the 'pjax' layout is used for pjax requests and the 'application' layout for other requests. If you want to override this, you can define the pjax_layout and default_layout methods in your controller.
+
+    class UsersController < ApplicationController
+      def pjax_layout
+        'pjax'
+      end
+
+      def default_layout
+        'default'
+      end
+    end
