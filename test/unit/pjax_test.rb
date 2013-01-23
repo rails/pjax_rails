@@ -5,8 +5,7 @@ class WithPjax < ApplicationController; end
 class WithoutPjax < ApplicationController; end
 
 class OverrideLayout < ApplicationController
-  protected
-  def pjax_layout; 'pjax' end
+  def pjax_layout   ; 'pjax'    end
   def default_layout; 'default' end
 end
 
