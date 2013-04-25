@@ -14,6 +14,10 @@ module Pjax
   class Error < StandardError; end
   class Unsupported < Error; end
 
+  def self.setup
+    ApplicationController.send :include, self
+  end
+
   protected
     def pjax_request?
       env['HTTP_X_PJAX'].present?
