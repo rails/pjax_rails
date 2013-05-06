@@ -3,7 +3,9 @@ require 'pjax'
 module PjaxRails
   class Engine < ::Rails::Engine
     initializer "pjax_rails.add_controller" do
-      config.to_prepare { ApplicationController.send :include, Pjax }
+      ActiveSupport.on_load :action_controller do
+        ActionController::Base.send :include, Pjax
+      end
     end
   end
 end
