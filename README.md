@@ -33,6 +33,3 @@ attribute, so for example:
         <%= link_to 'Google', 'http://google.com', 'data-skip-pjax' => true %>
       </div>
     </body>
-
-
-FIXME: Currently the layout is hardcoded to "application". Need to delegate that to the specific layout of the controller.
