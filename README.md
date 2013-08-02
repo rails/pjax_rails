@@ -13,7 +13,7 @@ want to exhibit PJAX should be explicitly enabled:
 
     # app/assets/javascripts/application.js
     $(function() {
-      $('a:not([data-remote]):not([data-behavior]):not([data-skip-pjax])').pjax('[data-pjax-container]');
+      $('[data-pjax-container]').pjax('a:not([data-remote]):not([data-behavior]):not([data-skip-pjax])');
     });
 
 For this example, the PJAX container has to be marked with data-pjax-container
@@ -34,5 +34,7 @@ attribute, so for example:
       </div>
     </body>
 
+Note that version 0.3.4 introduced breaking API changes.  Details at
+[PJAX - upgrade it](https://github.com/defunkt/jquery-pjax#upgrade-it)
 
 FIXME: Currently the layout is hardcoded to "application". Need to delegate that to the specific layout of the controller.
