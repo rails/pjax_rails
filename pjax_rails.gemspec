@@ -5,7 +5,10 @@ Gem::Specification.new do |s|
   s.email   = 'david@loudthinking.com'
   s.summary = 'PJAX integration for Rails 3.1+'
 
+  s.files = Dir['lib/**/*.rb', 'lib/**/*.js', 'vendor/**/*.js']
+
+  s.add_dependency 'railties', '>= 3.1', '< 5.0'
   s.add_dependency 'jquery-rails'
 
-  s.files = Dir["lib/**/*.rb", "lib/**/*.js", "vendor/**/*.js"]
+  s.add_development_dependency 'rake'
 end
