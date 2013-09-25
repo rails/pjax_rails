@@ -4,19 +4,23 @@ require 'action_controller'
 require 'pjax_rails'
 require 'rails/test_help'
 
-Class.new(Rails::Application) do |app|
-  app.configure do
-    config.active_support.deprecation = :notify
-    config.secret_token = 'a966a729a228e5d3edf00997e7b7eab7'
-    config.eager_load = false
+# Ruby 1.8 doesn't call self.inherited inside Class.new
+# Config and routes are unreacheable inside the block.
+app = Class.new(Rails::Application)
 
-    routes {
-      get '/:controller(/:action(/:id))'
-    }
-  end
+app.configure do
+  config.active_support.deprecation = :notify
+  config.secret_token = 'a966a729a228e5d3edf00997e7b7eab7'
+  config.eager_load = false
 
-  app.initialize!
+  routes {
+    get '/:controller(/:action(/:id))'
+  }
+
+  routes.finalize!
 end
+
+app.initialize!
 
 require 'action_view/testing/resolvers'
 
