@@ -6,7 +6,15 @@ class PjaxControllerTest < ActionController::TestCase
 
     get :index
 
-    assert_equal 'pjax#index', response.body
+    if Rails::VERSION::STRING >= '4.0.0'
+      assert_equal 'pjax#index', response.body
+    else
+      # The behavior for ~> 3.0 varies from 4.0. If there is a layout for parent
+      # controller and `layout` in parent controller is set to false it will be
+      # rendered anyway with a warning in a log file. It should be set explicit
+      # in child controller.
+      assert_equal 'layouts/application pjax#index', response.body
+    end
   end
 
   test 'renders with default layout' do
