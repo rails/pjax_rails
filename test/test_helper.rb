@@ -1,46 +1,17 @@
+ENV['RAILS_ENV'] ||= 'test'
+
 require 'test/unit'
-require 'rails'
-require 'action_controller'
-require 'pjax_rails'
+require 'dummy/config/environment'
 require 'rails/test_help'
+require 'capybara/poltergeist'
 
-# Ruby 1.8 doesn't call self.inherited inside Class.new
-# Config and routes are unreacheable inside the block.
-app = Class.new(Rails::Application)
+Capybara.app = Rails.application
+Capybara.default_driver = :poltergeist
+class ActiveSupport::IntegrationCase < ActiveSupport::TestCase
+  include Capybara::DSL
 
-app.configure do
-  config.active_support.deprecation = :notify
-  config.secret_token = 'a966a729a228e5d3edf00997e7b7eab7'
-  config.eager_load = false
-
-  routes {
-    get '/:controller(/:action(/:id))'
-  }
-
-  routes.finalize!
-end
-
-app.initialize!
-
-require 'action_view/testing/resolvers'
-
-class ApplicationController < ActionController::Base
-  include Rails.application.routes.url_helpers
-end
-
-class PjaxController < ApplicationController
-  append_view_path ActionView::FixtureResolver.new('layouts/application.html.erb' => 'layouts/application <%= yield %>')
-  append_view_path ActionView::FixtureResolver.new('pjax/index.html.erb' => 'pjax#index')
-  append_view_path ActionView::FixtureResolver.new('pjax/prevent_pjax.html.erb' => 'pjax#prevent_pjax')
-
-  def prevent_pjax
-    prevent_pjax!
+  def teardown
+    Capybara.reset_sessions!
+    Capybara.use_default_driver
   end
-end
-
-class WithLayoutController < ApplicationController
-  layout 'with_layout'
-
-  append_view_path ActionView::FixtureResolver.new('layouts/with_layout.html.erb' => 'layouts/with_layout <%= yield %>')
-  append_view_path ActionView::FixtureResolver.new('with_layout/index.html.erb' => 'with_layout#index')
 end

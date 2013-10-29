@@ -1,0 +1,9 @@
+<div>Will not be touched</div>
+
+<div data-pjax-container>
+  <%= content_tag :h3, 'Pjax container' %>
+  <%= link_to 'plainText', '/capybara/plain_text' %>
+  <%= link_to 'htmlContent', '/capybara/html_content' %>
+  <%= link_to 'fullReload', '/capybara/plain_text', 'data-skip-pjax' => true %>
+  <%= link_to 'preventsPjax', '/capybara/prevents_pjax' %>
+</div>

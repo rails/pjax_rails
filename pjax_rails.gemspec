@@ -11,5 +11,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'jquery-rails'
 
   s.add_development_dependency 'rake'
-  s.add_development_dependency 'tzinfo'
+  s.add_development_dependency 'rails'
+  s.add_development_dependency 'capybara'
+  s.add_development_dependency 'poltergeist'
 end

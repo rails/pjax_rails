@@ -6,12 +6,12 @@ class WithLayoutControllerTest < ActionController::TestCase
 
     get :index
 
-    assert_equal 'layouts/with_layout with_layout#index', response.body
+    assert_match 'layouts/with_layout with_layout#index', response.body
   end
 
   test 'renders with layout for regular request' do
     get :index
 
-    assert_equal 'layouts/with_layout with_layout#index', response.body
+    assert_match 'layouts/with_layout with_layout#index', response.body
   end
 end
