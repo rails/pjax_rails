@@ -1,4 +1,4 @@
-PJAX for Rails 3.1+
+PJAX for Rails 3.2+
 ===================
 [![Build Status](https://travis-ci.org/rails/pjax_rails.png?branch=master)](https://travis-ci.org/rails/pjax_rails)
 
@@ -10,9 +10,7 @@ To activate, add this to your app/assets/javascripts/application.js (or whatever
 //=require jquery.pjax
 ```
 
-In previous versions of `pjax_rails`, most links would automatically use PJAX.
-However, this was found to be too inflexible; instead, the types of links you
-want to exhibit PJAX should be explicitly enabled:
+Then choose all the types of links you want to exhibit PJAX:
 
 ```js
 // app/assets/javascripts/application.js
