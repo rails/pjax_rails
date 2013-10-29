@@ -70,7 +70,7 @@ function handleClick(event, container, options) {
     return
 
   // Ignore cross origin links
-  if ( location.protocol !== link.protocol || location.host !== link.host )
+  if ( location.protocol !== link.protocol || location.hostname !== link.hostname )
     return
 
   // Ignore anchors on the same page
@@ -85,13 +85,17 @@ function handleClick(event, container, options) {
   var defaults = {
     url: link.href,
     container: $(link).attr('data-pjax'),
-    target: link,
-    fragment: null
+    target: link
   }
 
-  pjax($.extend({}, defaults, options))
+  var opts = $.extend({}, defaults, options)
+  var clickEvent = $.Event('pjax:click')
+  $(link).trigger(clickEvent, [opts])
 
-  event.preventDefault()
+  if (!clickEvent.isDefaultPrevented()) {
+    pjax(opts)
+    event.preventDefault()
+  }
 }
 
 // Public: pjax on form submit handler
@@ -118,13 +122,11 @@ function handleSubmit(event, container, options) {
     throw "$.pjax.submit requires a form element"
 
   var defaults = {
-    type: form.method,
+    type: form.method.toUpperCase(),
     url: form.action,
     data: $(form).serializeArray(),
     container: $(form).attr('data-pjax'),
-    target: form,
-    fragment: null,
-    timeout: 0
+    target: form
   }
 
   pjax($.extend({}, defaults, options))
@@ -186,6 +188,12 @@ function pjax(options) {
       settings.timeout = 0
     }
 
+    xhr.setRequestHeader('X-PJAX', 'true')
+    xhr.setRequestHeader('X-PJAX-Container', context.selector)
+
+    if (!fire('pjax:beforeSend', [xhr, settings]))
+      return false
+
     if (settings.timeout > 0) {
       timeoutTimer = setTimeout(function() {
         if (fire('pjax:timeout', [xhr, options]))
@@ -195,14 +203,6 @@ function pjax(options) {
       // Clear timeout setting so jquerys internal timeout isn't invoked
       settings.timeout = 0
     }
-
-    xhr.setRequestHeader('X-PJAX', 'true')
-    xhr.setRequestHeader('X-PJAX-Container', context.selector)
-
-    var result
-
-    if (!fire('pjax:beforeSend', [xhr, settings]))
-      return false
 
     options.requestUrl = parseURL(settings.url).href
   }
@@ -226,8 +226,23 @@ function pjax(options) {
   }
 
   options.success = function(data, status, xhr) {
+    // If $.pjax.defaults.version is a function, invoke it first.
+    // Otherwise it can be a static string.
+    var currentVersion = (typeof $.pjax.defaults.version === 'function') ?
+      $.pjax.defaults.version() :
+      $.pjax.defaults.version
+
+    var latestVersion = xhr.getResponseHeader('X-PJAX-Version')
+
     var container = extractContainer(data, xhr, options)
 
+    // If there is a layout version mismatch, hard load the new url
+    if (currentVersion && latestVersion && currentVersion !== latestVersion) {
+      locationReplace(container.url)
+      return
+    }
+
+    // If the new response is missing a body, hard load the page
     if (!container.contents) {
       locationReplace(container.url)
       return
@@ -246,16 +261,27 @@ function pjax(options) {
       window.history.replaceState(pjax.state, container.title, container.url)
     }
 
+    // Clear out any focused controls before inserting new page contents.
+    document.activeElement.blur()
+
     if (container.title) document.title = container.title
     context.html(container.contents)
+
+    // FF bug: Won't autofocus fields that are inserted via JS.
+    // This behavior is incorrect. So if theres no current focus, autofocus
+    // the last field.
+    //
+    // http://www.w3.org/html/wg/drafts/html/master/forms.html
+    var autofocusEl = context.find('input[autofocus], textarea[autofocus]').last()[0]
+    if (autofocusEl && document.activeElement !== autofocusEl) {
+      autofocusEl.focus();
+    }
+
+    executeScriptTags(container.scripts)
 
     // Scroll to top by default
     if (typeof options.scrollTo === 'number')
       $(window).scrollTop(options.scrollTo)
-
-    // Google Analytics support
-    if ( (options.replace || options.push) && window._gaq )
-      _gaq.push(['_trackPageview'])
 
     // If the URL has a hash in it, make sure the browser
     // knows to navigate to the hash.
@@ -345,6 +371,23 @@ function locationReplace(url) {
   window.location.replace(url)
 }
 
+
+var initialPop = true
+var initialURL = window.location.href
+var initialState = window.history.state
+
+// Initialize $.pjax.state if possible
+// Happens when reloading a page and coming forward from a different
+// session history.
+if (initialState && initialState.container) {
+  pjax.state = initialState
+}
+
+// Non-webkit browsers don't fire an initial popstate event
+if ('state' in window.history) {
+  initialPop = false
+}
+
 // popstate handler takes care of the back and forward buttons
 //
 // You probably shouldn't use pjax on pages with other pushState
@@ -353,14 +396,23 @@ function onPjaxPopstate(event) {
   var state = event.state
 
   if (state && state.container) {
+    // When coming forward from a separate history session, will get an
+    // initial pop with a state we are already at. Skip reloading the current
+    // page.
+    if (initialPop && initialURL == state.url) return
+
+    // If popping back to the same state, just skip.
+    // Could be clicking back from hashchange rather than a pushState.
+    if (pjax.state.id === state.id) return
+
     var container = $(state.container)
     if (container.length) {
-      var contents = cacheMapping[state.id]
+      var direction, contents = cacheMapping[state.id]
 
       if (pjax.state) {
         // Since state ids always increase, we can deduce the history
         // direction from the previous state.
-        var direction = pjax.state.id < state.id ? 'forward' : 'back'
+        direction = pjax.state.id < state.id ? 'forward' : 'back'
 
         // Cache current container before replacement and inform the
         // cache which direction the history shifted.
@@ -402,6 +454,7 @@ function onPjaxPopstate(event) {
       locationReplace(location.href)
     }
   }
+  initialPop = false
 }
 
 // Fallback version of main pjax function for browsers that don't
@@ -546,6 +599,10 @@ function findAll(elems, selector) {
   return elems.filter(selector).add(elems.find(selector));
 }
 
+function parseHTML(html) {
+  return $.parseHTML(html, document, true)
+}
+
 // Internal: Extracts container and metadata from response.
 //
 // 1. Extracts X-PJAX-URL header if set
@@ -566,10 +623,10 @@ function extractContainer(data, xhr, options) {
 
   // Attempt to parse response html into elements
   if (/<html/i.test(data)) {
-    var $head = $(data.match(/<head[^>]*>([\s\S.]*)<\/head>/i)[0])
-    var $body = $(data.match(/<body[^>]*>([\s\S.]*)<\/body>/i)[0])
+    var $head = $(parseHTML(data.match(/<head[^>]*>([\s\S.]*)<\/head>/i)[0]))
+    var $body = $(parseHTML(data.match(/<body[^>]*>([\s\S.]*)<\/body>/i)[0]))
   } else {
-    var $head = $body = $(data)
+    var $head = $body = $(parseHTML(data))
   }
 
   // If response data is empty, return fast
@@ -605,16 +662,47 @@ function extractContainer(data, xhr, options) {
   // Clean up any <title> tags
   if (obj.contents) {
     // Remove any parent title elements
-    obj.contents = obj.contents.not('title')
+    obj.contents = obj.contents.not(function() { return $(this).is('title') })
 
-    // Then scrub any titles from their descendents
+    // Then scrub any titles from their descendants
     obj.contents.find('title').remove()
+
+    // Gather all script[src] elements
+    obj.scripts = findAll(obj.contents, 'script[src]').remove()
+    obj.contents = obj.contents.not(obj.scripts)
   }
 
   // Trim any whitespace off the title
   if (obj.title) obj.title = $.trim(obj.title)
 
   return obj
+}
+
+// Load an execute scripts using standard script request.
+//
+// Avoids jQuery's traditional $.getScript which does a XHR request and
+// globalEval.
+//
+// scripts - jQuery object of script Elements
+//
+// Returns nothing.
+function executeScriptTags(scripts) {
+  if (!scripts) return
+
+  var existingScripts = $('script[src]')
+
+  scripts.each(function() {
+    var src = this.src
+    var matchedScripts = existingScripts.filter(function() {
+      return this.src === src
+    })
+    if (matchedScripts.length) return
+
+    var script = document.createElement('script')
+    script.type = $(this).attr('type')
+    script.src = $(this).attr('src')
+    document.head.appendChild(script)
+  })
 }
 
 // Internal: History DOM caching class.
@@ -670,6 +758,16 @@ function cachePop(direction, id, value) {
     delete cacheMapping[id]
 }
 
+// Public: Find version identifier for the initial page load.
+//
+// Returns String version or undefined.
+function findVersion() {
+  return $('meta').filter(function() {
+    var name = $(this).attr('http-equiv')
+    return name && name.toUpperCase() === 'X-PJAX-VERSION'
+  }).attr('content')
+}
+
 // Install pjax functions on $.pjax to enable pushState behavior.
 //
 // Does nothing if already enabled.
@@ -694,9 +792,10 @@ function enable() {
     type: 'GET',
     dataType: 'html',
     scrollTo: 0,
-    maxCacheLength: 20
+    maxCacheLength: 20,
+    version: findVersion
   }
-  $(window).bind('popstate.pjax', onPjaxPopstate)
+  $(window).on('popstate.pjax', onPjaxPopstate)
 }
 
 // Disable pushState behavior.
@@ -719,7 +818,7 @@ function disable() {
   $.pjax.submit = $.noop
   $.pjax.reload = function() { window.location.reload() }
 
-  $(window).unbind('popstate.pjax', onPjaxPopstate)
+  $(window).off('popstate.pjax', onPjaxPopstate)
 }
 
 
@@ -728,7 +827,7 @@ function disable() {
 if ( $.inArray('state', $.event.props) < 0 )
   $.event.props.push('state')
 
- // Is pjax supported by this browser?
+// Is pjax supported by this browser?
 $.support.pjax =
   window.history && window.history.pushState && window.history.replaceState &&
   // pushState isn't reliable on iOS until 5.
