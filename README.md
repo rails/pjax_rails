@@ -2,7 +2,7 @@ PJAX for Rails 3.2+
 ===================
 [![Build Status](https://travis-ci.org/rails/pjax_rails.png?branch=master)](https://travis-ci.org/rails/pjax_rails)
 
-Integrate Chris Wanstrath's [PJAX](https://github.com/defunkt/jquery-pjax) into Rails 3.1+ via the asset pipeline.
+Integrate Chris Wanstrath's [PJAX](https://github.com/defunkt/jquery-pjax) into Rails 3.2+ via the asset pipeline.
 
 To activate, add this to your app/assets/javascripts/application.js (or whatever bundle you use):
 
