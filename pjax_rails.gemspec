@@ -4,6 +4,8 @@ Gem::Specification.new do |s|
   s.author  = 'David Heinemeier Hansson (PJAX by Chris Wanstrath)'
   s.email   = 'david@loudthinking.com'
   s.summary = 'PJAX integration for Rails 3.1+'
+  s.homepage = 'https://github.com/rails/pjax_rails'
+  s.license = 'MIT'
 
   s.files = Dir['lib/**/*.rb', 'lib/**/*.js', 'vendor/**/*.js']
 
