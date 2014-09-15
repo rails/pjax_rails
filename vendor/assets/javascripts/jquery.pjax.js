@@ -74,7 +74,10 @@ function handleClick(event, container, options) {
     return
 
   // Ignore anchors on the same page
-  if (link.hash && link.href.replace(link.hash, '') ===
+  var effectiveHash = link.hash, idx = link.href.indexOf('#')
+  if (!effectiveHash && idx > -1)
+    effectiveHash = link.href.substring(idx)
+  if (effectiveHash && link.href.replace(effectiveHash, '') ===
        location.href.replace(location.hash, ''))
     return
 
