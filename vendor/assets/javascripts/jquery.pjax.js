@@ -281,6 +281,10 @@ function pjax(options) {
       state: pjax.state,
       previousState: previousState
     })
+    if (options.push && !options.replace) {
+      // Cache current container element before replacing it
+      cachePush(previousState.id, context.clone().contents())
+	}
     context.html(container.contents)
 
     // FF bug: Won't autofocus fields that are inserted via JS.
@@ -349,9 +353,6 @@ function pjax(options) {
 
   if (xhr.readyState > 0) {
     if (options.push && !options.replace) {
-      // Cache current container element before replacing it
-      cachePush(pjax.state.id, context.clone().contents())
-
       window.history.pushState(null, "", stripPjaxParam(options.requestUrl))
     }
 
