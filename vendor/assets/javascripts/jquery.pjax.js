@@ -266,6 +266,15 @@ function pjax(options) {
       timeout: options.timeout
     }
 
+    if (options.push && !options.replace) {
+      fire('pjax:beforeCache', [container.contents, options], {
+        state: pjax.state,
+        previousState: previousState
+      })
+      // Cache current container element before replacing it
+      cachePush(previousState.id, context.clone().contents())
+	}
+
     if (options.push || options.replace) {
       window.history.replaceState(pjax.state, container.title, container.url)
     }
@@ -281,10 +290,6 @@ function pjax(options) {
       state: pjax.state,
       previousState: previousState
     })
-    if (options.push && !options.replace) {
-      // Cache current container element before replacing it
-      cachePush(previousState.id, context.clone().contents())
-	}
     context.html(container.contents)
 
     // FF bug: Won't autofocus fields that are inserted via JS.
@@ -432,6 +437,11 @@ function onPjaxPopstate(event) {
         // direction from the previous state.
         direction = pjax.state.id < state.id ? 'forward' : 'back'
 
+        var beforeCacheEvent = $.Event('pjax:beforeCache', {
+          state: state,
+          previousState: previousState
+        });
+        container.trigger(beforeCacheEvent, [container.contents])
         // Cache current container before replacement and inform the
         // cache which direction the history shifted.
         cachePop(direction, pjax.state.id, container.clone().contents())
