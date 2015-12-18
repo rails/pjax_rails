@@ -49,7 +49,7 @@ module Pjax
 
     def strip_pjax_param
       params.delete(:_pjax)
-      request.env['QUERY_STRING'] = request.env['QUERY_STRING'].sub(/_pjax=[^&]+&?/, '')
+      request.env['QUERY_STRING'] = request.env['QUERY_STRING'].sub(/(?:\?|&)_pjax=[^&]+/, '')
 
       request.env.delete('rack.request.query_string')
       request.env.delete('rack.request.query_hash')
