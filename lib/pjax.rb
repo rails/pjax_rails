@@ -7,8 +7,8 @@ module Pjax
 
     rescue_from Pjax::Unsupported, :with => :pjax_unsupported
 
-    before_filter :strip_pjax_param, :if => :pjax_request?
-    before_filter :set_pjax_url,     :if => :pjax_request?
+    before_action :strip_pjax_param, :if => :pjax_request?
+    before_action :set_pjax_url,     :if => :pjax_request?
   end
 
   class Error < StandardError; end
@@ -32,11 +32,11 @@ module Pjax
       head :not_acceptable
     end
 
-    # Call in a before_filter or in an action to disable pjax on an action.
+    # Call in a before_action or in an action to disable pjax on an action.
     #
     # Examples
     #
-    #     before_filter :prevent_pjax!
+    #     before_action :prevent_pjax!
     #
     #     def login
     #       prevent_pjax!
