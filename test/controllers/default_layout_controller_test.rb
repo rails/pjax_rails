@@ -36,7 +36,7 @@ class DefaultLayoutControllerTest < ActionController::TestCase
 
     get :index, '_pjax' => true
 
-    assert_equal({ 'controller' => 'default_layout', 'action' => 'index' }, @controller.params)
+    assert_equal({ 'controller' => 'default_layout', 'action' => 'index' }, @controller.params.to_h)
     assert_equal '', request.env['QUERY_STRING']
     assert_nil request.env['rack.request.query_string']
     assert_nil request.env['rack.request.query_hash']
