@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.files = Dir['lib/**/*.rb', 'lib/**/*.js', 'vendor/**/*.js']
 
-  s.add_dependency 'railties', '>= 3.2', '< 5.0'
+  s.add_dependency 'railties', '>= 3.2', '< 6.0'
   s.add_dependency 'jquery-rails'
 
   s.add_development_dependency 'rake'

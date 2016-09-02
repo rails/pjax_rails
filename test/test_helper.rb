@@ -1,8 +1,8 @@
 ENV['RAILS_ENV'] ||= 'test'
 
-require 'test/unit'
 require 'dummy/config/environment'
 require 'rails/test_help'
+require 'capybara/rails'
 require 'capybara/poltergeist'
 
 Capybara.app = Rails.application
