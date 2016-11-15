@@ -7,8 +7,13 @@ module Pjax
 
     rescue_from Pjax::Unsupported, :with => :pjax_unsupported
 
-    before_action :strip_pjax_param, :if => :pjax_request?
-    before_action :set_pjax_url,     :if => :pjax_request?
+    if respond_to? :before_action
+      before_action :strip_pjax_param, :if => :pjax_request?
+      before_action :set_pjax_url,     :if => :pjax_request?
+    else
+      before_filter :strip_pjax_param, :if => :pjax_request?
+      before_filter :set_pjax_url,     :if => :pjax_request?
+    end
   end
 
   class Error < StandardError; end
