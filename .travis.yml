@@ -8,7 +8,6 @@ rvm:
   - 2.0.0
   - 2.2.2
   - jruby-19mode
-  - rbx
 
 gemfile:
   - test/gemfiles/Gemfile.rails-3.2.x
