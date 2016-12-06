@@ -49,6 +49,20 @@ class DefaultLayoutControllerTest < ActionController::TestCase
     assert_equal '/default_layout', request.fullpath
   end
 
+  test 'strips pjax params with multiple params' do
+    request.env['HTTP_X_PJAX'] = true
+
+    get :index, 'bar' => 'baz', 'foo' => 'bar', '_pjax' => true
+
+    assert_equal({ 'controller' => 'default_layout', 'action' => 'index', 'bar' => 'baz', 'foo' => 'bar' }, Hash[@controller.params])
+    assert_equal 'bar=baz&foo=bar', request.env['QUERY_STRING']
+    assert_nil request.env['rack.request.query_string']
+    assert_nil request.env['rack.request.query_hash']
+    assert_nil request.env['action_dispatch.request.query_parameters']
+    assert_equal '/default_layout?bar=baz&foo=bar', request.original_fullpath
+    assert_equal '/default_layout?bar=baz&foo=bar', request.fullpath
+  end
+
   test 'sets pjax url' do
     request.env['HTTP_X_PJAX'] = true
 
