@@ -1,5 +1,16 @@
 require 'test_helper'
 
+class Hash
+  # override Hash#to_query to prevent sorting of params
+  def to_query(namespace = nil)
+    collect do |key, value|
+      unless (value.is_a?(Hash) || value.is_a?(Array)) && value.empty?
+        value.to_query(namespace ? "#{namespace}[#{key}]" : key)
+      end
+    end.compact * "&"
+  end
+end
+
 class DefaultLayoutControllerTest < ActionController::TestCase
   test 'renders without layout' do
     request.env['HTTP_X_PJAX'] = true
