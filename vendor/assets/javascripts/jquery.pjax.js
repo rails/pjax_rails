@@ -288,7 +288,7 @@ function pjax(options) {
       timeout: options.timeout
     }
 
-    if (options.push || options.replace) {
+    if (!options.push || options.replace) {
       window.history.replaceState(pjax.state, container.title, container.url)
     }
 
