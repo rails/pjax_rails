@@ -7,6 +7,7 @@ Dummy::Application.configure do
 
   if Rails::VERSION::STRING >= '5.0.0'
     config.public_file_server.headers = { 'Cache-Control' => 'public, max-age=3600' }
+    config.action_controller.permit_all_parameters = true
   else
     config.static_cache_control = "public, max-age=3600"
   end

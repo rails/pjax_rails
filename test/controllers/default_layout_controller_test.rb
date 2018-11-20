@@ -34,7 +34,11 @@ class DefaultLayoutControllerTest < ActionController::TestCase
   test 'strips pjax params' do
     request.env['HTTP_X_PJAX'] = true
 
-    get :index, '_pjax' => true
+    if Rails::VERSION::STRING >= '5.0.0'
+      get :index, params: { '_pjax' => true }
+    else
+      get :index, '_pjax' => true
+    end
 
     assert_equal({ 'controller' => 'default_layout', 'action' => 'index' }, Hash[@controller.params])
     assert_equal '', request.env['QUERY_STRING']
