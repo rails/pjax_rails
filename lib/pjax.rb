@@ -1,4 +1,7 @@
 module Pjax
+  class Error < StandardError; end
+  class Unsupported < Error; end
+
   extend ActiveSupport::Concern
 
   included do
@@ -16,55 +19,53 @@ module Pjax
     end
   end
 
-  class Error < StandardError; end
-  class Unsupported < Error; end
-
   protected
-    def pjax_request?
-      request.env['HTTP_X_PJAX'].present?
-    end
 
-    def pjax_layout
-      false
-    end
+  def pjax_request?
+    request.env['HTTP_X_PJAX'].present?
+  end
 
-    def pjax_container
-      return unless pjax_request?
-      request.headers['X-PJAX-Container']
-    end
+  def pjax_layout
+    false
+  end
 
-    def pjax_unsupported
-      head :not_acceptable
-    end
+  def pjax_container
+    return unless pjax_request?
+    request.headers['X-PJAX-Container']
+  end
 
-    # Call in a before_action or in an action to disable pjax on an action.
-    #
-    # Examples
-    #
-    #     before_action :prevent_pjax!
-    #
-    #     def login
-    #       prevent_pjax!
-    #       # ...
-    #     end
-    #
-    def prevent_pjax!
-      raise Pjax::Unsupported if pjax_request?
-    end
+  def pjax_unsupported
+    head :not_acceptable
+  end
 
-    def strip_pjax_param
-      params.delete(:_pjax)
-      request.env['QUERY_STRING'] = request.env['QUERY_STRING'].sub(/^_pjax=[^&]+&?|&_pjax=[^&]+/, '')
+  # Call in a before_action or in an action to disable pjax on an action.
+  #
+  # Examples
+  #
+  #     before_action :prevent_pjax!
+  #
+  #     def login
+  #       prevent_pjax!
+  #       # ...
+  #     end
+  #
+  def prevent_pjax!
+    raise Pjax::Unsupported if pjax_request?
+  end
 
-      request.env.delete('rack.request.query_string')
-      request.env.delete('rack.request.query_hash')
-      request.env.delete('action_dispatch.request.query_parameters')
+  def strip_pjax_param
+    params.delete(:_pjax)
+    request.env['QUERY_STRING'] = request.env['QUERY_STRING'].sub(/\A_pjax=[^&]+&?|&_pjax=[^&]+/, '')
 
-      request.instance_variable_set('@original_fullpath', nil)
-      request.instance_variable_set('@fullpath', nil)
-    end
+    request.env.delete('rack.request.query_string')
+    request.env.delete('rack.request.query_hash')
+    request.env.delete('action_dispatch.request.query_parameters')
 
-    def set_pjax_url
-      response.headers['X-PJAX-URL'] = request.url
-    end
+    request.instance_variable_set('@original_fullpath', nil)
+    request.instance_variable_set('@fullpath', nil)
+  end
+
+  def set_pjax_url
+    response.headers['X-PJAX-URL'] = request.url
+  end
 end

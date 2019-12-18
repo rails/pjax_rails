@@ -3,7 +3,7 @@ Dummy::Application.configure do
 
   config.eager_load = false
 
-  config.serve_static_assets  = true
+  config.serve_static_files = true
 
   if Rails::VERSION::STRING >= '5.0.0'
     config.public_file_server.headers = { 'Cache-Control' => 'public, max-age=3600' }
