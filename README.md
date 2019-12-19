@@ -2,9 +2,11 @@ PJAX for Rails
 ===================
 [![Build Status](https://travis-ci.org/rails/pjax_rails.png?branch=master)](https://travis-ci.org/rails/pjax_rails)
 
-Integrate Chris Wanstrath's [PJAX](https://github.com/defunkt/jquery-pjax) into Rails via the asset pipeline.
+Integrate Chris Wanstrath's [PJAX](https://github.com/defunkt/jquery-pjax) into
+Rails via the asset pipeline.
 
-To activate, add this to your app/assets/javascripts/application.js (or whatever bundle you use):
+To activate, add this to your app/assets/javascripts/application.js (or whatever
+bundle you use):
 
 ```js
 //=require jquery.pjax
@@ -39,8 +41,13 @@ attribute, so for example:
 </body>
 ```
 
-##Layouts
-By default, the `pjax_rails` gem will not render your application layout file and will instead only return the yielded view. But if you have additional content you want to always be returned with your pjax requests, you can override `pjax_layout` in your controller and specify a layout to render (by default, it's `false`)
+## Layouts
+
+By default, the `pjax_rails` gem will not render your application layout file
+and will instead only return the yielded view. But if you have additional
+content you want to always be returned with your pjax requests, you can override
+`pjax_layout` in your controller and specify a layout to render (by default,
+it's `false`)
 
 ```ruby
 class ApplicationController < ActionController::Base
