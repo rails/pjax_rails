@@ -6,9 +6,6 @@ before_install:
   - bundle _1.17.3_ install
 
 rvm:
-  - 1.9.3
-  - 2.0.0
-  - 2.2.10
   - 2.5.7
   - 2.6.5
 
@@ -17,24 +14,3 @@ gemfile:
   - test/gemfiles/Gemfile.rails-5.x
   - test/gemfiles/Gemfile.rails-6.x
   - test/gemfiles/Gemfile.rails-edge
-
-matrix:
-  exclude:
-    - rvm: 1.9.3
-      gemfile: test/gemfiles/Gemfile.rails-5.x
-    - rvm: 2.0.0
-      gemfile: test/gemfiles/Gemfile.rails-5.x
-    - rvm: 2.2.10
-      gemfile: test/gemfiles/Gemfile.rails-5.x
-    - rvm: 1.9.3
-      gemfile: test/gemfiles/Gemfile.rails-6.x
-    - rvm: 2.0.0
-      gemfile: test/gemfiles/Gemfile.rails-6.x
-    - rvm: 2.2.10
-      gemfile: test/gemfiles/Gemfile.rails-6.x
-    - rvm: 1.9.3
-      gemfile: test/gemfiles/Gemfile.rails-edge
-    - rvm: 2.0.0
-      gemfile: test/gemfiles/Gemfile.rails-edge
-    - rvm: 2.2.10
-      gemfile: test/gemfiles/Gemfile.rails-edge

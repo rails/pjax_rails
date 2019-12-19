@@ -3,11 +3,11 @@ ENV['RAILS_ENV'] ||= 'test'
 require 'dummy/config/environment'
 require 'rails/test_help'
 require 'capybara/rails'
-require 'capybara/poltergeist'
+require 'capybara/cuprite'
 
 Capybara.app = Rails.application
 Capybara.server = :webrick
-Capybara.default_driver = :poltergeist
+Capybara.default_driver = :cuprite
 
 class ActiveSupport::IntegrationCase < ActiveSupport::TestCase
   include Capybara::DSL
