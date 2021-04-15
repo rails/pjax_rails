@@ -221,7 +221,7 @@ function pjax(options) {
           xhr.abort('timeout')
       }, settings.timeout)
 
-      // Clear timeout setting so jquerys internal timeout isn't invoked
+      // Clear timeout setting so jQuerys internal timeout isn't invoked
       settings.timeout = 0
     }
 
