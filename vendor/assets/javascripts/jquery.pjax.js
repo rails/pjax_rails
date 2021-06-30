@@ -680,8 +680,8 @@ function extractContainer(data, xhr, options) {
     return obj
 
   // If there's a <title> tag in the header, use it as
-  // the page's title.
-  obj.title = findAll($head, 'title').last().text()
+  // the page's title. Ignore tags nested in a <svg> tag.
+  obj.title = findAll($head, ':not(svg) > title').last().text()
 
   if (options.fragment) {
     var $fragment = $body
